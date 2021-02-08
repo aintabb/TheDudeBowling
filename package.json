@@ -1,0 +1,39 @@
+{
+  "name": "thedude-bowling-scorer",
+  "version": "1.0.0",
+  "description": "Bowling Scorer Project For The Zebra",
+  "main": "src/app.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "nodemon",
+    "inspect": "nodemon --inspect src/app.ts",
+    "test": "jest",
+    "lint": "npm run lint:js ",
+    "lint:eslint": "eslint --ignore-path .gitignore --ext .ts",
+    "lint:js": "npm run lint:eslint src/",
+    "lint:fix": "npm run lint:js -- --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "keywords": [
+    "bowlingscorer",
+    "js",
+    "javascript",
+    "typescript",
+    "node",
+    "express"
+  ],
+  "author": "yunus-emre-ozvarlik",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "method-override": "^3.0.0",
+    "nodemon": "^2.0.7",
+    "winston": "^3.3.3"
+  }
+}
