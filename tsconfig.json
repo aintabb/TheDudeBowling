@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "jsx": "react",
     "target": "es2017",
     "lib": [
       "es2017",
@@ -7,7 +8,7 @@
     ],
     "typeRoots": [
       "./node_modules/@types",
-      "./src/types"
+      "./src/type"
     ],
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
@@ -19,8 +20,13 @@
     "sourceMap": true,
     "outDir": "./build",
     "allowJs": true,
-    "noEmit": false,
-    "esModuleInterop": true
+    "noEmit": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noFallthroughCasesInSwitch": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true
   },
   "include": [
     "./src/**/*"
@@ -28,5 +34,5 @@
   "exclude": [
     "node_modules",
     "tests"
-  ]
+  ],
 }

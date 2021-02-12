@@ -33,7 +33,7 @@ export default ({ app }: { app: express.Application }) => {
 
   // Catch 404 and forward to error handler
   app.use((req, res, next) => {
-    const err = new Error('Not Found');
+    const err = new Error('Route could not be found!');
     err['status'] = 404;
     next(err);
   });
