@@ -67,13 +67,16 @@ export default class Game {
         return this.frames[this._frameNumber - 1];
     }
 
-    public roll(roll: Roll) {
-        this._rolls.push(roll);
+    public roll(...rolls: Roll[]) {
+        this._rolls.push(...rolls);
 
-        if (roll > this.pinsRemaining) throw new Error('Invalid roll.');
+        for (let i = 0; i < rolls.length; i++) {
+            let roll = rolls[i];
+            if (roll > this.pinsRemaining) throw new Error('Invalid roll.');
 
-        if (this._frameNumber != 10) this.handleStandardFrameRoll(roll);
-        else this.handleTenthFrameRoll(roll);
+            if (this._frameNumber != 10) this.handleStandardFrameRoll(roll);
+            else this.handleTenthFrameRoll(roll);
+        }
     }
 
     private handleStandardFrameRoll(roll: Roll) {
@@ -84,6 +87,8 @@ export default class Game {
                 this.switchToNextFrame();
             }
             else {
+                // Prepare pins and roll counter
+                // for the Second roll
                 this._pinsRemaining -= roll;
                 this._rollCount++;
             }
@@ -102,8 +107,9 @@ export default class Game {
         }
         else if (this.rollCount == 1) {
             tenthFrame.rollTwo = roll;
-            // TODO: > should be == ?
             if (this._pinsRemaining - roll > 0) this._gameOver = true;
+        // TenthFrameMark specifies that there is a strike
+        // in tenth frame.
         } else if (this._tenthFrameMark) {
             tenthFrame.rollThree = roll;
             this._gameOver = true;

@@ -2,6 +2,8 @@ import Frame from './Frame.model';
 import Game from './Game.model';
 import { Roll } from '../type';
 
+// Depending on the rolls, tenth frame might have 3 rolls.
+// That's why it created and represented in a different class.
 export default class TenthFrame extends Frame {
     private _roll3? : Roll;
 
@@ -18,8 +20,8 @@ export default class TenthFrame extends Frame {
     }
 
     get score() {
-        return Number.parseInt((this.rollOne || 0)) +
-        Number.parseInt((this.rollTwo || 0)) +
-        Number.parseInt((this.rollThree || 0));
+        return (this.rollOne || 0) +
+        (this.rollTwo || 0) +
+        (this.rollThree || 0);
     }
 }

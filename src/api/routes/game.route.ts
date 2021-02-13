@@ -5,21 +5,30 @@ import Game from '../../models/Game.model';
 import { Roll } from '../../type'
 
 const route = Router();
-let activeGame: Game | undefined;
+// Initialize an empty game object.
+// # Note: We could've create a db instead and
+// process the operations with it but I chose this way.
+let activeGame : Game | undefined;
+// Keep track of created games and assigned it
+// to newly generated games.
 let gameCount = 0;
 
 export default (app: Router) => {
   app.use('/game', route);
 
+  // Initialize a new game and return current stats.
   route.post('/createNewGame', (req: Request, res: Response, next: NextFunction) => {
     const logger : Logger = LoggerInstance;
     logger.debug('Initializing a new game!', req.body);
 
     activeGame = new Game(++gameCount);
+
     try {
       return res.status(201).send({
         id: activeGame.id,
-        message: `New game with id: ${activeGame.id} has been created!`
+        message: `New game with id: ${activeGame.id} has been created!`,
+        totalScore: activeGame.totalScore,
+        gameOver: activeGame.gameOver
       });
     } catch (e) {
       logger.error('Error!', e);
@@ -27,6 +36,7 @@ export default (app: Router) => {
     }
   });
 
+  // Check if the game is active before playing the game.
   function isGameActive() {
     if (typeof activeGame === typeof undefined) {
       return false;
@@ -35,6 +45,7 @@ export default (app: Router) => {
     return true;
   }
 
+  // Using POST b/c, roll the ball with the provided value.
   route.post('/roll/:rollValue', (req: Request, res: Response, next: NextFunction) => {
     const logger:Logger = LoggerInstance;
     logger.debug('Rolling the ball!', req.body);
@@ -44,7 +55,7 @@ export default (app: Router) => {
       return res.status(404).send({ message: "There is no active game! Create a new game"});
     }
 
-    let rollValue = req.params.rollValue as Roll;
+    let rollValue = req.params.rollValue as unknown as Roll;
     if (rollValue === undefined || isNaN(rollValue) || rollValue > 10 || rollValue < 0)
     {
       if (rollValue > activeGame?.pinsRemaining) {
@@ -55,7 +66,7 @@ export default (app: Router) => {
 
     let remainingPinsForPreviousFrame = activeGame?.pinsRemaining - rollValue;
     let previousFrame = activeGame?.frameNumber;
-    activeGame?.roll(req.params.rollValue as Roll);
+    activeGame?.roll(req.params.rollValue as unknown as Roll);
 
     if(activeGame?.gameOver) {
       console.log(`Game Over! Score: ${activeGame?.totalScore}`);
@@ -73,6 +84,7 @@ export default (app: Router) => {
     }
   });
 
+  // Using POST, get specific frame score. 
   route.post('/frameScore/:frameNumber', (req: Request, res: Response, next: NextFunction) => {
     let frameNumber : number = Number.parseInt(req.params.frameNumber);
     const logger:Logger = LoggerInstance;
@@ -106,10 +118,12 @@ export default (app: Router) => {
     }
   });
 
+  // Auto-play, the game will roll the ball until end of the game and shows the result.
   route.post('/livePlay', (req: Request, res: Response, next: NextFunction) => {
     const logger:Logger = LoggerInstance;
     logger.debug(`Initializing a game with auto rolls!`);
 
+    // Active game check for preventing any issues.
     if (!isGameActive()) {
       logger.warn(`There is no active game! Create a new game`);
       return res.status(404).send({ message: "There is no active game! Please create a new game."});
@@ -120,13 +134,16 @@ export default (app: Router) => {
     }
 
     while (!activeGame?.gameOver) {
+      // Get a random number between the number of remaining pins and 0.
       let rollValue : Roll = Math.floor((Math.random() * activeGame?.pinsRemaining) + 1);
       let frameNumber = activeGame?.frameNumber;
+      // Roll the ball and update the score
       activeGame?.roll(rollValue);
 
+      // Get score of each frame for logging.
       let frameScore : number = activeGame?.frames.
                                 find(frame =>
-                                   frame.order == activeGame.frameNumber)?.
+                                   frame.order == activeGame?.frameNumber)?.
                                    framePoints;
 
       logger.info(
@@ -141,7 +158,24 @@ export default (app: Router) => {
 
     try {
       return res.status(201).send({
-        message: `Game Over! Total Score: ${activeGame.totalScore}`
+        message: `Game Over! Total Score: ${activeGame.totalScore}`,
+        totalScore: activeGame?.totalScore
+      });
+    } catch (e) {
+      logger.error('Error!', e);
+      return next(e);
+    }
+  });
+
+  // Tribute to the movie called "The Big Lebowski"
+  route.get('/meetWithTheDude', (req: Request, res: Response, next: NextFunction) => {
+    const logger:Logger = LoggerInstance;
+    logger.debug(`Initializing a game with auto rolls!`);
+
+    try {
+      return res.status(201).send({
+        message: `'The Dude abides.', 'Well, that\'s just, like, your opinion, man.',
+                  'You are entering a world of pain.',`
       });
     } catch (e) {
       logger.error('Error!', e);
